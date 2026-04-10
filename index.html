@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Task App</title>
+</head>
+<body>
+
+<h2>Actual Work List</h2>
+
+<input id="taskInput" placeholder="Task">
+<input type="date" id="dateInput">
+<button onclick="addTask()">Add</button>
+
+<table border="1">
+  <thead>
+    <tr>
+      <th>Task</th>
+      <th>Due Date</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody id="table"></tbody>
+</table>
+
+<script>
+const API = "https://script.google.com/macros/s/AKfycbykS5NU8JKJx9l8kjFGv_fg2UWpmMMCFmg58JoRa7e4RaYISeMLCKo_fK7zzPwy_9Qa/exec";
+
+async function loadTasks() {
+  let res = await fetch(API);
+  let data = await res.json();
+
+  let html = "";
+
+  data.forEach(t => {
+    html += `
+      <tr>
+        <td>${t.task}</td>
+        <td>${new Date(t.dueDate).toLocaleDateString()}</td>
+        <td>${t.status ? "✅" : "❌"}</td>
+      </tr>
+    `;
+  });
+
+  document.getElementById("table").innerHTML = html;
+}
+
+async function addTask() {
+  let task = document.getElementById("taskInput").value;
+  let date = document.getElementById("dateInput").value;
+
+  await fetch(API, {
+    method: "POST",
+    body: JSON.stringify({ task: task, dueDate: date })
+  });
+
+  loadTasks();
+}
+
+loadTasks();
+</script>
+
+</body>
+</html>
